@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+*.log
+.env
+_metadata/
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+*.swp
+*.swo

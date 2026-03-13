@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'">
+  <title>ShadowBlock Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 5.5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5.5L12 2Z" fill="#1a1a2e"/>
+          <path d="M12 4.5L5.5 7V11.5C5.5 15.7 8.5 19.6 12 20.8C15.5 19.6 18.5 15.7 18.5 11.5V7L12 4.5Z" stroke="#7c3aed" stroke-width="0.8" fill="none" opacity="0.8"/>
+          <line x1="9" y1="12" x2="15" y2="11" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+        </svg>
+        <div>
+          <h1>ShadowBlock</h1>
+          <p class="subtitle">Settings</p>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-section="general">General</button>
+      <button class="nav-btn" data-section="filters">Filter Lists</button>
+      <button class="nav-btn" data-section="allowlist">Allowlist</button>
+      <button class="nav-btn" data-section="rules">My Rules</button>
+      <button class="nav-btn" data-section="stats">Statistics</button>
+      <button class="nav-btn" data-section="backup">Import/Export</button>
+      <button class="nav-btn" data-section="about">About</button>
+    </nav>
+
+    <main>
+      <section class="section active" id="section-general">
+        <h2>General</h2>
+        <div class="setting-row">
+          <div><strong>Enable ShadowBlock</strong><p class="setting-desc">Master toggle for all blocking</p></div>
+          <label class="switch"><input type="checkbox" id="globalToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Cosmetic Filtering</strong><p class="setting-desc">Hide ad elements with CSS (in addition to network blocking)</p></div>
+          <label class="switch"><input type="checkbox" id="cosmeticToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Anti-Adblock Bypass</strong><p class="setting-desc">Defeat "please disable your adblocker" walls</p></div>
+          <label class="switch"><input type="checkbox" id="antiAdblockToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Show Badge Count</strong><p class="setting-desc">Display blocked request count on toolbar icon</p></div>
+          <label class="switch"><input type="checkbox" id="badgeToggle" checked><span class="slider"></span></label>
+        </div>
+      </section>
+
+      <section class="section" id="section-filters">
+        <h2>Filter Lists</h2>
+        <div class="setting-row">
+          <div><strong>Ads</strong><p class="setting-desc">EasyList + uBlock Filters</p></div>
+          <label class="switch"><input type="checkbox" data-ruleset="ads" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Trackers</strong><p class="setting-desc">EasyPrivacy + Peter Lowe's list</p></div>
+          <label class="switch"><input type="checkbox" data-ruleset="trackers" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Annoyances</strong><p class="setting-desc">Cookie notices, newsletter popups, chat widgets</p></div>
+          <label class="switch"><input type="checkbox" data-ruleset="annoyances" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong>Redirects</strong><p class="setting-desc">Serve neutered stubs instead of blocking (prevents site breakage)</p></div>
+          <label class="switch"><input type="checkbox" data-ruleset="redirects" checked><span class="slider"></span></label>
+        </div>
+        <div class="update-section">
+          <p>Last updated: <span id="lastUpdate">never</span></p>
+          <button class="btn" id="updateAllBtn">Update All Lists</button>
+          <span class="update-msg" id="updateMsg"></span>
+        </div>
+      </section>
+
+      <section class="section" id="section-allowlist">
+        <h2>Allowlist</h2>
+        <p class="setting-desc">Blocking is disabled on these domains.</p>
+        <div class="allowlist-input-row">
+          <input type="text" id="allowlistInput" placeholder="example.com" class="text-input">
+          <button class="btn" id="addAllowlistBtn">Add</button>
+        </div>
+        <ul class="allowlist" id="allowlistEntries"></ul>
+      </section>
+
+      <section class="section" id="section-rules">
+        <h2>My Rules</h2>
+        <p class="setting-desc">Custom blocking rules. One per line. Supports <code>||domain.com^</code> (network) and <code>example.com##.ad</code> (cosmetic). <code>@@</code> for exceptions.</p>
+        <textarea id="rulesEditor" class="rules-editor" rows="12"></textarea>
+        <div class="rules-actions">
+          <button class="btn" id="saveRulesBtn">Save Rules</button>
+          <span id="rulesStatus"></span>
+        </div>
+      </section>
+
+      <section class="section" id="section-stats">
+        <h2>Statistics</h2>
+        <div class="stats-grid">
+          <div class="stats-card">
+            <span class="stats-big" id="statTotal">0</span>
+            <span class="stats-label">Total blocked</span>
+          </div>
+          <div class="stats-card">
+            <span class="stats-big" id="statSession">0</span>
+            <span class="stats-label">This session</span>
+          </div>
+        </div>
+        <h3>Top Blocked Domains</h3>
+        <div class="top-domains" id="topDomains"></div>
+        <button class="btn btn-danger" id="resetStatsBtn">Reset All Stats</button>
+      </section>
+
+      <section class="section" id="section-backup">
+        <h2>Import / Export</h2>
+        <p class="setting-desc">Backup your settings, rules, and allowlist to a JSON file.</p>
+        <div class="backup-actions">
+          <button class="btn" id="exportBtn">Export Settings</button>
+          <button class="btn" id="importBtn">Import Settings</button>
+          <input type="file" id="importFile" accept=".json" hidden>
+        </div>
+      </section>
+
+      <section class="section" id="section-about">
+        <h2>About</h2>
+        <div class="about-info">
+          <p><strong>ShadowBlock</strong> v2.0.0</p>
+          <p>Dark, fast, undetectable ad blocker.</p>
+          <p>Built by Allan &amp; Claude.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

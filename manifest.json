@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "name": "ShadowBlock",
+  "version": "2.0.0",
+  "description": "Stealth ad blocker — fast, undetectable, privacy-first.",
+
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "storage",
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "alarms"
+  ],
+
+  "host_permissions": ["<all_urls>"],
+
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/cosmetic-filter.js", "content/scriptlet-injector.js", "content/element-picker.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"],
+      "js": ["content/youtube-blocker.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "options_ui": { "page": "options/options.html", "open_in_tab": true },
+
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ads",
+        "enabled": true,
+        "path": "rules/ads.json"
+      },
+      {
+        "id": "trackers",
+        "enabled": true,
+        "path": "rules/trackers.json"
+      },
+      {
+        "id": "annoyances",
+        "enabled": true,
+        "path": "rules/annoyances.json"
+      },
+      {
+        "id": "redirects",
+        "enabled": true,
+        "path": "rules/redirects.json"
+      }
+    ]
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "web_accessible_resources": [{
+    "resources": [
+      "stubs/1x1.gif",
+      "stubs/2x2.png",
+      "stubs/amazon_apstag.js",
+      "stubs/doubleclick_instream.js",
+      "stubs/google-analytics_analytics.js",
+      "stubs/google-analytics_ga.js",
+      "stubs/google-ima.js",
+      "stubs/googlesyndication_adsbygoogle.js",
+      "stubs/googletagmanager_gtm.js",
+      "stubs/googletagservices_gpt.js",
+      "stubs/noop-vast2.xml",
+      "stubs/noop-vast3.xml",
+      "stubs/noop.json",
+      "stubs/noopjs",
+      "stubs/outbrain-widget.js",
+      "stubs/scorecardresearch_beacon.js"
+    ],
+    "matches": ["<all_urls>"]
+  }]
+}

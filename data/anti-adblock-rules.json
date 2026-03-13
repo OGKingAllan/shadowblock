@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "version": 1,
+    "description": "Domain-specific scriptlet rules for anti-adblock bypass",
+    "updated": "2026-03-12"
+  },
+  "generic": [
+    { "scriptlet": "set-constant", "args": ["canRunAds", "true"] },
+    { "scriptlet": "set-constant", "args": ["adBlockDetected", "false"] },
+    { "scriptlet": "set-constant", "args": ["isAdBlockActive", "false"] },
+    { "scriptlet": "abort-on-property-read", "args": ["FuckAdBlock"] },
+    { "scriptlet": "abort-on-property-read", "args": ["BlockAdBlock"] },
+    { "scriptlet": "abort-on-property-read", "args": ["detectAdBlock"] },
+    { "scriptlet": "set-constant", "args": ["adblockDetector", "noopFunc"] },
+    { "scriptlet": "abort-on-property-read", "args": ["adBlockDetected"] }
+  ],
+  "forbes.com": [
+    { "scriptlet": "set-constant", "args": ["fbs_settings.canRunAds", "true"] },
+    { "scriptlet": "abort-on-property-read", "args": ["AdBlocker"] },
+    { "scriptlet": "remove-class", "args": ["ad-block-overlay"] },
+    { "scriptlet": "set-constant", "args": ["detectBlocker", "noopFunc"] }
+  ],
+  "wired.com": [
+    { "scriptlet": "set-constant", "args": ["WM.defined", "true"] },
+    { "scriptlet": "abort-current-script", "args": ["document.createElement", "admiral"] },
+    { "scriptlet": "set-constant", "args": ["admiralDetected", "false"] }
+  ],
+  "nytimes.com": [
+    { "scriptlet": "set-constant", "args": ["canRunAds", "true"] },
+    { "scriptlet": "json-prune", "args": ["data.user.adBlockerStatus"] }
+  ],
+  "washingtonpost.com": [
+    { "scriptlet": "set-constant", "args": ["pwapi.adBlock", "false"] },
+    { "scriptlet": "abort-on-property-read", "args": ["adblock_detected"] }
+  ],
+  "businessinsider.com": [
+    { "scriptlet": "abort-current-script", "args": ["document.createElement", "adblock"] },
+    { "scriptlet": "set-constant", "args": ["adsBlocked", "false"] }
+  ],
+  "theguardian.com": [
+    { "scriptlet": "set-constant", "args": ["guardian.commercial.adBlockDetected", "false"] }
+  ],
+  "cnn.com": [
+    { "scriptlet": "set-constant", "args": ["CNN.defined", "true"] },
+    { "scriptlet": "abort-on-property-read", "args": ["adblockDetect"] }
+  ],
+  "dailymail.co.uk": [
+    { "scriptlet": "set-constant", "args": ["DM.hasAdBlocker", "false"] }
+  ],
+  "bild.de": [
+    { "scriptlet": "abort-on-property-read", "args": ["BILDadblock"] },
+    { "scriptlet": "set-constant", "args": ["adBlockDetection", "noopFunc"] }
+  ],
+  "spiegel.de": [
+    { "scriptlet": "abort-current-script", "args": ["document.createElement", "adblock"] }
+  ],
+  "weather.com": [
+    { "scriptlet": "set-constant", "args": ["AdBlockEnabled", "false"] }
+  ],
+  "fandom.com": [
+    { "scriptlet": "abort-on-property-read", "args": ["wgAdBlockDetected"] },
+    { "scriptlet": "set-constant", "args": ["ads.adBlockDetected", "false"] }
+  ],
+  "twitch.tv": [
+    { "scriptlet": "set-constant", "args": ["Ember.adBlock", "false"] },
+    { "scriptlet": "json-prune", "args": ["data.extensions.adBlock"] }
+  ],
+  "indiatimes.com": [
+    { "scriptlet": "abort-on-property-read", "args": ["canRun"] },
+    { "scriptlet": "set-constant", "args": ["adBlockerDetected", "false"] }
+  ],
+  "ndtv.com": [
+    { "scriptlet": "set-constant", "args": ["ndtv_ads_blocked", "false"] }
+  ],
+  "hindustantimes.com": [
+    { "scriptlet": "set-constant", "args": ["isAdBlockEnabled", "false"] }
+  ],
+  "thehindu.com": [
+    { "scriptlet": "set-constant", "args": ["isAdBlockerPresent", "false"] }
+  ],
+  "livemint.com": [
+    { "scriptlet": "abort-on-property-read", "args": ["adBlockDetected"] }
+  ],
+  "moneycontrol.com": [
+    { "scriptlet": "set-constant", "args": ["MC.adblocked", "false"] }
+  ],
+  "timesofindia.indiatimes.com": [
+    { "scriptlet": "set-constant", "args": ["adblock_detected", "false"] }
+  ]
+}

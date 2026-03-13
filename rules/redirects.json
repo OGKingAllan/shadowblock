@@ -1,0 +1,98 @@
+[
+  {
+    "id": 500001,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/googlesyndication_adsbygoogle.js" } },
+    "condition": { "urlFilter": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500002,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/google-analytics_analytics.js" } },
+    "condition": { "urlFilter": "google-analytics.com/analytics.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500003,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/google-analytics_ga.js" } },
+    "condition": { "urlFilter": "google-analytics.com/ga.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500004,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/googletagmanager_gtm.js" } },
+    "condition": { "urlFilter": "googletagmanager.com/gtm.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500005,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/googletagmanager_gtm.js" } },
+    "condition": { "urlFilter": "googletagmanager.com/gtag/js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500006,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/googletagservices_gpt.js" } },
+    "condition": { "urlFilter": "googletagservices.com/tag/js/gpt.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500007,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/googletagservices_gpt.js" } },
+    "condition": { "urlFilter": "securepubads.g.doubleclick.net/tag/js/gpt.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500008,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/google-ima.js" } },
+    "condition": { "urlFilter": "imasdk.googleapis.com/js/sdkloader/ima3.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500009,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/amazon_apstag.js" } },
+    "condition": { "urlFilter": "c.amazon-adsystem.com/aax2/apstag.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500010,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/doubleclick_instream.js" } },
+    "condition": { "urlFilter": "doubleclick.net/instream/ad_status.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500011,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/scorecardresearch_beacon.js" } },
+    "condition": { "urlFilter": "sb.scorecardresearch.com/beacon.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500012,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/outbrain-widget.js" } },
+    "condition": { "urlFilter": "widgets.outbrain.com/outbrain.js", "resourceTypes": ["script"] }
+  },
+  {
+    "id": 500013,
+    "priority": 900,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/1x1.gif" } },
+    "condition": { "regexFilter": ".*\\.gif$", "requestDomains": ["pixel.quantserve.com", "b.scorecardresearch.com", "pixel.facebook.com"], "resourceTypes": ["image"] }
+  },
+  {
+    "id": 500014,
+    "priority": 900,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/2x2.png" } },
+    "condition": { "regexFilter": ".*\\.png$", "requestDomains": ["pixel.quantserve.com", "ad.doubleclick.net"], "resourceTypes": ["image"] }
+  },
+  {
+    "id": 500015,
+    "priority": 1000,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/noop-vast2.xml" } },
+    "condition": { "regexFilter": ".*vast.*\\.xml", "resourceTypes": ["xmlhttprequest"], "requestDomains": ["ad.doubleclick.net", "pubads.g.doubleclick.net"] }
+  },
+  {
+    "id": 500016,
+    "priority": 800,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/stubs/noopjs" } },
+    "condition": { "urlFilter": "pagead2.googlesyndication.com/pagead/show_ads.js", "resourceTypes": ["script"] }
+  }
+]

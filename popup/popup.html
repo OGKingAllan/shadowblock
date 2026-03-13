@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'">
+  <title>ShadowBlock</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L3 5.5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5.5L12 2Z" fill="#1a1a2e"/>
+            <path d="M12 4.5L5.5 7V11.5C5.5 15.7 8.5 19.6 12 20.8C15.5 19.6 18.5 15.7 18.5 11.5V7L12 4.5Z" stroke="#7c3aed" stroke-width="0.8" fill="none" opacity="0.8"/>
+            <line x1="9" y1="12" x2="15" y2="11" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          </svg>
+        </div>
+        <div>
+          <h1>ShadowBlock</h1>
+          <p class="subtitle"><span id="hostname">—</span><span class="stealth-dot" title="Stealth active"></span></p>
+        </div>
+      </div>
+      <div class="power-toggle">
+        <label class="switch" title="Toggle for this site">
+          <input type="checkbox" id="siteToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="my-rules">My Rules</button>
+    </div>
+
+    <!-- Tab: Overview -->
+    <div class="tab-content active" id="tab-overview">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-number" id="siteBlocked">0</span>
+          <span class="stat-label">This site</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number" id="totalBlocked">0</span>
+          <span class="stat-label">Total blocked</span>
+        </div>
+      </div>
+
+      <!-- Rulesets -->
+      <div class="section">
+        <h2>Filter Lists</h2>
+        <div class="ruleset-row">
+          <span>Ads</span>
+          <label class="switch small">
+            <input type="checkbox" id="rulesetAds" checked data-ruleset="ads">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="ruleset-row">
+          <span>Trackers</span>
+          <label class="switch small">
+            <input type="checkbox" id="rulesetTrackers" checked data-ruleset="trackers">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="ruleset-row">
+          <span>Annoyances</span>
+          <label class="switch small">
+            <input type="checkbox" id="rulesetAnnoyances" checked data-ruleset="annoyances">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Filter Updates -->
+      <div class="section">
+        <h2>Filter Updates</h2>
+        <div class="update-row">
+          <span class="update-label" id="lastUpdateText">Last update: never</span>
+          <button class="btn-update" id="updateFilters">Update Now</button>
+        </div>
+        <div class="update-status" id="updateStatus"></div>
+      </div>
+    </div>
+
+    <!-- Tab: My Rules -->
+    <div class="tab-content" id="tab-my-rules">
+      <div class="section">
+        <h2>Custom Rules</h2>
+        <p class="help-text">One rule per line. Supports network rules (<code>||domain.com^</code>) and cosmetic rules (<code>example.com##.ad-class</code>). Use <code>@@</code> prefix for exceptions.</p>
+        <textarea id="userRulesEditor" class="rules-editor" placeholder="||ads.example.com^
+example.com##.ad-banner
+@@||example.com/whitelist^" rows="6"></textarea>
+        <div class="rules-actions">
+          <button class="btn-primary" id="saveRules">Save Rules</button>
+          <span class="rules-count" id="rulesCount">0 rules active</span>
+        </div>
+      </div>
+
+      <!-- Active User Rules List -->
+      <div class="section">
+        <h2>Active Rules</h2>
+        <div class="rules-list" id="rulesList">
+          <div class="rules-empty">No custom rules added yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <button id="resetStats" class="btn-text">Reset stats</button>
+      <span class="version">v2.0.0</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

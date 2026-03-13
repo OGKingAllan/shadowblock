@@ -1,0 +1,2 @@
+export const USER_RULE_ID_OFFSET = 200000;
+export const DYNAMIC_RULE_ID_OFFSET = 100000;

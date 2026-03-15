@@ -649,7 +649,6 @@
         adWasPlaying = true;
         clearInterval(adPollInterval);
         adPollInterval = setInterval(adPollTick, 100);
-        _intervals.push(adPollInterval);
       }
     } else {
       if (adWasPlaying) {
@@ -657,7 +656,6 @@
         restoreAfterAd();
         clearInterval(adPollInterval);
         adPollInterval = setInterval(adPollTick, 1000);
-        _intervals.push(adPollInterval);
       }
     }
   }
@@ -726,7 +724,9 @@
   }
 
   window.addEventListener('yt-navigate-finish', handleShortsAds);
-  _intervals.push(setInterval(handleShortsAds, 3000));
+  _intervals.push(setInterval(() => {
+    if (location.pathname.startsWith('/shorts')) handleShortsAds();
+  }, 3000));
 
   // ---------------------------------------------------------------------------
   // 10. PREMIUM UPSELL / DIALOG BLOCKER
@@ -768,6 +768,7 @@
 
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === 'stateChanged' && !msg.enabled) {
+      clearInterval(adPollInterval);
       _intervals.forEach(clearInterval);
       _intervals.length = 0;
       if (observer) {

@@ -37,10 +37,15 @@
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "stateChanged") {
       isEnabled = msg.enabled;
-      if (!isEnabled) {
+      if ('cosmeticFiltering' in msg) {
+        cosmeticEnabled = msg.cosmeticFiltering;
+      }
+      if (!isEnabled || !cosmeticEnabled) {
         removeInjectedStyles();
       } else {
         injectStyles();
+        loadUserRules();
+        loadCompiledSelectors();
       }
     }
   });

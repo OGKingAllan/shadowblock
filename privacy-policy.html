@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShadowBlock — Privacy Policy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.7; padding: 2rem; }
+    .container { max-width: 720px; margin: 0 auto; }
+    h1 { color: #7c3aed; font-size: 2rem; margin-bottom: 0.5rem; }
+    .updated { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+    h2 { color: #a78bfa; font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.5rem; }
+    p, li { margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; }
+    a { color: #7c3aed; }
+    .tldr { background: #1a1a2e; border-left: 3px solid #7c3aed; padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin-bottom: 2rem; }
+    .tldr strong { color: #7c3aed; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ShadowBlock Privacy Policy</h1>
+    <p class="updated">Last updated: March 15, 2026</p>
+
+    <div class="tldr">
+      <strong>TL;DR:</strong> ShadowBlock does not collect, store, transmit, or sell any of your data. Everything runs locally on your device. We have no servers, no analytics, no tracking. Period.
+    </div>
+
+    <h2>What Data We Collect</h2>
+    <p>None. ShadowBlock does not collect any personal data, browsing history, or usage analytics.</p>
+
+    <h2>What Data Is Stored</h2>
+    <p>ShadowBlock stores the following data locally on your device using Chrome's built-in storage API:</p>
+    <ul>
+      <li>Your blocking preferences (which filter lists are enabled)</li>
+      <li>Custom rules you create</li>
+      <li>Per-site toggle settings (sites you've whitelisted)</li>
+      <li>Aggregate blocking statistics (total ads blocked — no URLs or page content)</li>
+    </ul>
+    <p>This data never leaves your device. It is not transmitted to any server.</p>
+
+    <h2>Network Requests</h2>
+    <p>ShadowBlock makes zero network requests. All filter lists are bundled with the extension. There are no remote servers, no telemetry endpoints, no update pings.</p>
+
+    <h2>Permissions Explained</h2>
+    <ul>
+      <li><strong>declarativeNetRequest:</strong> Used to block ad and tracker network requests before they load. This is Chrome's recommended API for content blockers.</li>
+      <li><strong>storage:</strong> Saves your preferences and custom rules locally.</li>
+      <li><strong>activeTab:</strong> Lets the popup show stats for the current tab.</li>
+      <li><strong>scripting:</strong> Injects cosmetic filters to hide ad elements on pages.</li>
+      <li><strong>contextMenus:</strong> Adds right-click options for blocking elements.</li>
+      <li><strong>alarms:</strong> Used for internal scheduling (e.g., periodic stat updates).</li>
+      <li><strong>host_permissions (all URLs):</strong> Required to block ads and apply cosmetic filters on all websites. No data is read or collected from these pages.</li>
+    </ul>
+
+    <h2>Third Parties</h2>
+    <p>ShadowBlock does not share data with any third parties because there is no data to share. We do not use analytics services, advertising networks, or crash reporting tools.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>ShadowBlock does not collect data from anyone, including children under 13.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>If we ever change this policy, we will update this page and the "last updated" date above. Given that our policy is "we collect nothing," changes are unlikely.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this privacy policy? Email: <a href="mailto:shadowblock.ext@gmail.com">shadowblock.ext@gmail.com</a></p>
+  </div>
+</body>
+</html>

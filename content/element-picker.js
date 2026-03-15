@@ -97,10 +97,6 @@
   }
 
   function tryDataAttributes(el) {
-    const dominated = ["data-ad", "data-ad-slot", "data-ad-unit", "data-adunit",
-      "data-google-query-id", "data-native-ad", "data-ad-module", "data-testid",
-      "data-widget-type", "data-pagelet"];
-
     for (const attr of el.attributes) {
       if (attr.name.startsWith("data-")) {
         const sel = `${el.tagName.toLowerCase()}[${attr.name}="${CSS.escape(attr.value)}"]`;

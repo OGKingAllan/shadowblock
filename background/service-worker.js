@@ -3,11 +3,15 @@
  * Manages DNR rulesets, per-site settings, blocked request stats, and messaging.
  */
 
-import { initFilterUpdater, forceUpdate, getUpdateStatus, applyUserRules } from "./filter-updater.js";
+import { initFilterUpdater, forceUpdate, getUpdateStatus, applyUserRules, handleFilterAlarm } from "./filter-updater.js";
 import { USER_RULE_ID_OFFSET } from "./constants.js";
 
 // ── Initialize filter updater ───────────────────────────────────────────────
 initFilterUpdater();
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  handleFilterAlarm(alarm);
+});
 
 // ── State ──────────────────────────────────────────────────────────────────
 const DEFAULT_SETTINGS = {
@@ -85,47 +89,52 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// ── Track blocked requests ─────────────────────────────────────────────────
-let _statsBuffer = {};
+// ── Badge: blocked request counting ──────────────────────────────────────
+chrome.action.setBadgeBackgroundColor({ color: "#e74c3c" });
 
-function bufferStat(hostname) {
-  _statsBuffer[hostname] = (_statsBuffer[hostname] || 0) + 1;
+// Try native DNR badge counter first
+const _hasNativeBadge = typeof chrome.declarativeNetRequest.setActionCountAsBadgeText === 'function';
+if (_hasNativeBadge) {
+  chrome.declarativeNetRequest.setActionCountAsBadgeText(true);
 }
 
-async function flushStats() {
-  const buf = _statsBuffer;
-  _statsBuffer = {};
-  if (Object.keys(buf).length === 0) return;
-  const { stats = { totalBlocked: 0, sessionBlocked: 0, perSite: {} } } = await chrome.storage.local.get('stats');
-  for (const [host, count] of Object.entries(buf)) {
-    stats.totalBlocked = (stats.totalBlocked || 0) + count;
-    stats.sessionBlocked = (stats.sessionBlocked || 0) + count;
-    stats.perSite = stats.perSite || {};
-    stats.perSite[host] = (stats.perSite[host] || 0) + count;
-  }
-  await chrome.storage.local.set({ stats });
+// Fallback: manual counting via webRequest observation (non-blocking, MV3 allowed)
+const _tabCounts = {};
+
+if (!_hasNativeBadge) {
+  // webRequest.onCompleted won't fire for blocked requests.
+  // Instead, count via onErrorOccurred — blocked requests show as net::ERR_BLOCKED_BY_CLIENT
+  chrome.webRequest.onErrorOccurred.addListener(
+    (details) => {
+      if (details.error === 'net::ERR_BLOCKED_BY_CLIENT' && details.tabId > 0) {
+        _tabCounts[details.tabId] = (_tabCounts[details.tabId] || 0) + 1;
+        const count = _tabCounts[details.tabId];
+        const text = count > 999 ? '999+' : String(count);
+        chrome.action.setBadgeText({ text, tabId: details.tabId });
+      }
+    },
+    { urls: ['<all_urls>'] }
+  );
+
+  // Reset count on navigation
+  chrome.webNavigation.onCommitted.addListener((details) => {
+    if (details.frameId === 0 && details.tabId > 0) {
+      _tabCounts[details.tabId] = 0;
+      chrome.action.setBadgeText({ text: '', tabId: details.tabId });
+      // Pre-set red background so there's no green flash when counts start coming in
+      chrome.action.setBadgeBackgroundColor({ color: "#e74c3c", tabId: details.tabId });
+    }
+  });
+
+  // Clean up on tab close
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    delete _tabCounts[tabId];
+  });
 }
 
-chrome.alarms.create('shadowblock-flush-stats', { periodInMinutes: 5 / 60 });
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'shadowblock-flush-stats') {
-    flushStats();
-  }
-});
-
-chrome.declarativeNetRequest.onRuleMatchedDebug?.addListener((info) => {
-  const url = info.request?.url;
-  if (!url) return;
-  try {
-    const hostname = new URL(info.request.initiator || url).hostname;
-    bufferStat(hostname);
-  } catch (_) {}
-});
-
-// ── Badge: show blocked count on icon ──────────────────────────────────────
+// Override badge for disabled sites
 async function updateBadge(tabId, hostname) {
-  const data = await chrome.storage.local.get(["stats", "settings", "siteOverrides"]);
+  const data = await chrome.storage.local.get(["settings", "siteOverrides"]);
   const settings = data.settings || DEFAULT_SETTINGS;
   const overrides = data.siteOverrides || {};
   const siteEnabled = overrides[hostname]?.enabled ?? settings.enabled;
@@ -136,15 +145,11 @@ async function updateBadge(tabId, hostname) {
     return;
   }
 
-  // Respect showBadge setting — hide badge entirely when disabled
   if (settings.showBadge === false) {
     chrome.action.setBadgeText({ text: "", tabId });
     return;
   }
 
-  const count = data.stats?.perSite?.[hostname] || 0;
-  const text = count > 999 ? "999+" : count > 0 ? String(count) : "";
-  chrome.action.setBadgeText({ text, tabId });
   chrome.action.setBadgeBackgroundColor({ color: "#e74c3c", tabId });
 }
 
@@ -315,9 +320,25 @@ async function handleMessage(msg, sender) {
       return { ok: true, ...result };
     }
 
+    case "getTabCount": {
+      const count = _tabCounts[msg.tabId] || 0;
+      return { ok: true, count };
+    }
+
     case "settingsChanged": {
-      // Settings were updated externally (e.g. from options page) — reload from storage
-      // This ensures the service worker picks up any changes immediately
+      const data = await chrome.storage.local.get(["settings"]);
+      const settings = data.settings || DEFAULT_SETTINGS;
+      const tabs = await chrome.tabs.query({});
+      for (const tab of tabs) {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, {
+            type: "stateChanged",
+            enabled: settings.enabled,
+            cosmeticFiltering: settings.cosmeticFiltering,
+            antiAdblock: settings.antiAdblock,
+          }).catch(() => {});
+        }
+      }
       return { ok: true };
     }
 

@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "ShadowBlock",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Stealth ad blocker — fast, undetectable, privacy-first.",
 
   "permissions": [
     "declarativeNetRequest",
-    "declarativeNetRequestFeedback",
+    "webRequest",
+    "webNavigation",
     "storage",
     "activeTab",
     "scripting",

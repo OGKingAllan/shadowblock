@@ -99,8 +99,27 @@
 
   document.getElementById('addAllowlistBtn').addEventListener('click', async () => {
     const input = document.getElementById('allowlistInput');
-    const domain = input.value.trim().toLowerCase();
+    let domain = input.value.trim().toLowerCase();
     if (!domain) return;
+
+    // Strip protocol and path if user pasted a full URL
+    try {
+      if (domain.includes('://') || domain.includes('/')) {
+        const url = new URL(domain.startsWith('http') ? domain : 'https://' + domain);
+        domain = url.hostname;
+      }
+    } catch (_) {}
+
+    // Strip www. prefix
+    domain = domain.replace(/^www\./, '');
+
+    // Basic domain validation
+    if (!/^[a-z0-9]([a-z0-9-]*\.)*[a-z0-9]+\.[a-z]{2,}$/i.test(domain)) {
+      input.style.borderColor = '#f85149';
+      setTimeout(() => { input.style.borderColor = ''; }, 2000);
+      return;
+    }
+
     const data = await chrome.storage.local.get(['siteOverrides']);
     const ov = data.siteOverrides || {};
     ov[domain] = { enabled: false };
@@ -128,7 +147,7 @@
       const p = document.createElement('p');
       p.style.color = '#8b949e';
       p.style.fontSize = '13px';
-      p.textContent = 'No data yet';
+      p.textContent = 'Per-tab stats available in popup';
       container.appendChild(p);
       return;
     }
@@ -156,7 +175,8 @@
 
   // Import/Export
   document.getElementById('exportBtn').addEventListener('click', async () => {
-    const data = await chrome.storage.local.get(null);
+    const EXPORT_KEYS = ['settings', 'siteOverrides', 'userCustomRules', 'stats', 'userRules'];
+    const data = await chrome.storage.local.get(EXPORT_KEYS);
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

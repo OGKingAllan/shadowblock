@@ -105,19 +105,32 @@ async function loadState() {
     type: "getState",
     hostname: currentHostname,
   });
-
   if (!response?.ok) return;
 
-  // Site toggle
   $("#siteToggle").checked = response.enabled;
   document.body.classList.toggle("disabled", !response.enabled);
 
-  // Stats
-  const stats = response.stats || {};
-  animateCount($("#siteBlocked"), stats.perSite?.[currentHostname] || 0);
-  animateCount($("#totalBlocked"), stats.totalBlocked || 0);
+  // Stats — read badge text for current tab (set by native DNR counter or webRequest fallback)
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  let siteCount = 0;
+  if (tab?.id) {
+    try {
+      const badgeText = await chrome.action.getBadgeText({ tabId: tab.id });
+      if (badgeText && badgeText !== "OFF") {
+        siteCount = parseInt(badgeText) || 0;
+      }
+    } catch (_) {}
+  }
+  animateCount($("#siteBlocked"), siteCount);
 
-  // Rulesets
+  // Total — ask background for tab count
+  const statsResp = await chrome.runtime.sendMessage({ type: "getTabCount", tabId: tab?.id });
+  if (statsResp?.count !== undefined) {
+    animateCount($("#totalBlocked"), statsResp.count);
+  } else {
+    $("#totalBlocked").textContent = siteCount > 0 ? String(siteCount) : "—";
+  }
+
   const rulesets = response.settings?.rulesets || {};
   for (const [id, enabled] of Object.entries(rulesets)) {
     const el = $(`[data-ruleset="${id}"]`);
@@ -293,7 +306,8 @@ async function toggleSite() {
 
   // Background handler owns the stateChanged notification to content scripts.
   // Do NOT send a second direct tabs.sendMessage here — that causes double-firing.
-  chrome.runtime.sendMessage({ type: "toggleSite", hostname: currentHostname });
+  // Await to ensure state is saved before popup might close.
+  await chrome.runtime.sendMessage({ type: "toggleSite", hostname: currentHostname });
 }
 
 // ── Reset stats ────────────────────────────────────────────────────────────
@@ -304,12 +318,6 @@ async function resetStats() {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function formatNumber(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
-  if (n >= 1000) return (n / 1000).toFixed(1) + "K";
-  return String(n);
-}
-
 function formatDate(date) {
   const now = new Date();
   const diffMs = now - date;

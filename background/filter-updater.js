@@ -28,16 +28,6 @@ export async function initFilterUpdater() {
     });
   }
 
-  // Listen for alarm fires
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === UPDATE_ALARM_NAME) {
-      checkForUpdates();
-    }
-    if (alarm.name === 'shadowblock-clear-badge') {
-      chrome.action.setBadgeText({ text: "" });
-    }
-  });
-
   // Check on startup if stale (>24h since last update)
   const state = await getUpdateState();
   const hoursSinceUpdate = (Date.now() - (state.lastUpdate || 0)) / (1000 * 60 * 60);
@@ -178,6 +168,27 @@ function parseAbpToDnr(abpText, listName) {
   return rules;
 }
 
+function findOptionDollar(raw) {
+  const KNOWN_OPTIONS = new Set([
+    'script', 'image', 'stylesheet', 'font', 'media', 'object',
+    'xmlhttprequest', 'subdocument', 'websocket', 'ping', 'popup',
+    'other', 'third-party', '~third-party', 'domain', 'match-case',
+    '~script', '~image', '~stylesheet', '~font', '~media', '~object',
+    '~xmlhttprequest', '~subdocument', '~websocket', '~ping', '~popup',
+    '~other', 'object-subrequest', '~object-subrequest',
+  ]);
+  for (let i = raw.length - 1; i >= 0; i--) {
+    if (raw[i] === '$') {
+      const optStr = raw.slice(i + 1);
+      const firstToken = optStr.split(',')[0].trim().toLowerCase();
+      if (KNOWN_OPTIONS.has(firstToken) || firstToken.startsWith('domain=')) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
 function parseAbpRule(line, ruleId) {
   const isException = line.startsWith("@@");
   const raw = isException ? line.slice(2) : line;
@@ -185,7 +196,7 @@ function parseAbpRule(line, ruleId) {
   // Extract options after $
   let pattern = raw;
   let options = {};
-  const dollarIdx = raw.lastIndexOf("$");
+  const dollarIdx = findOptionDollar(raw);
   if (dollarIdx >= 0) {
     const optStr = raw.slice(dollarIdx + 1);
     pattern = raw.slice(0, dollarIdx);
@@ -254,6 +265,13 @@ function parseAbpRule(line, ruleId) {
     rule.condition.resourceTypes = options.resourceTypes;
   }
 
+  if (options.thirdParty) {
+    rule.condition.domainType = "thirdParty";
+  }
+  if (options.firstParty) {
+    rule.condition.domainType = "firstParty";
+  }
+
   return rule;
 }
 
@@ -297,8 +315,13 @@ function parseAbpOptions(optStr) {
       continue;
     }
 
-    // Third-party (handled by static compiler — skip in dynamic parser)
-    if (trimmed === "third-party" || trimmed === "~third-party") {
+    // Third-party / first-party
+    if (trimmed === "third-party") {
+      opts.thirdParty = true;
+      continue;
+    }
+    if (trimmed === "~third-party") {
+      opts.firstParty = true;
       continue;
     }
 
@@ -308,8 +331,15 @@ function parseAbpOptions(optStr) {
     if (ABP_TO_DNR_TYPES[typeName]) {
       if (!isNegated) {
         opts.resourceTypes.push(ABP_TO_DNR_TYPES[typeName]);
+      } else {
+        const ALL_TYPES = ['main_frame', 'sub_frame', 'stylesheet', 'script', 'image', 'font', 'object', 'xmlhttprequest', 'ping', 'media', 'websocket', 'other'];
+        const excludeType = ABP_TO_DNR_TYPES[typeName];
+        if (opts.resourceTypes.length === 0) {
+          opts.resourceTypes = ALL_TYPES.filter(t => t !== excludeType);
+        } else {
+          opts.resourceTypes = opts.resourceTypes.filter(t => t !== excludeType);
+        }
       }
-      // Negated types are complex — skip for now
     }
 
     // Unsupported options
@@ -415,4 +445,13 @@ export async function getUpdateStatus() {
 
 export async function forceUpdate() {
   return checkForUpdates();
+}
+
+export function handleFilterAlarm(alarm) {
+  if (alarm.name === UPDATE_ALARM_NAME) {
+    checkForUpdates();
+  }
+  if (alarm.name === 'shadowblock-clear-badge') {
+    chrome.action.setBadgeText({ text: "" });
+  }
 }

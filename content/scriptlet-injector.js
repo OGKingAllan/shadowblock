@@ -1226,6 +1226,47 @@
 
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // SCRIPTLET ALIASES (uBlock Origin / AdGuard shorthand names)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const ALIASES = {
+    // Shorthand → actual registered name
+    "set": "set-constant",
+    "acs": "abort-current-inline-script",
+    "aost": "abort-on-property-read",       // closest equivalent in our registry
+    "rmnt": "remove-node-text",
+    "aeld": "prevent-addEventListener",
+    "nosiif": "prevent-setInterval",
+    "noeval": "abort-current-inline-script", // blocks inline eval scripts
+    "aopr": "abort-on-property-read",
+    "no-fetch-if": "prevent-fetch",
+    "no-xhr-if": "prevent-xhr",
+    // .js suffix variants
+    "set-constant.js": "set-constant",
+    "abort-current-script.js": "abort-current-inline-script",
+    "abort-current-inline-script.js": "abort-current-inline-script",
+    "abort-on-stack-trace.js": "abort-on-property-read",
+    "remove-node-text.js": "remove-node-text",
+    "addEventListener-defuser.js": "prevent-addEventListener",
+    "prevent-fetch.js": "prevent-fetch",
+    "prevent-xhr.js": "prevent-xhr",
+    "abort-on-property-read.js": "abort-on-property-read",
+    "no-setInterval-if.js": "prevent-setInterval",
+    "prevent-addEventListener.js": "prevent-addEventListener",
+    "prevent-setInterval.js": "prevent-setInterval",
+    // uBO full names → our registered names
+    "abort-current-script": "abort-current-inline-script",
+    "addEventListener-defuser": "prevent-addEventListener",
+    "no-setInterval-if": "prevent-setInterval",
+  };
+
+  for (const [alias, target] of Object.entries(ALIASES)) {
+    if (SCRIPTLETS[target] && !SCRIPTLETS[alias]) {
+      SCRIPTLETS[alias] = SCRIPTLETS[target];
+    }
+  }
+
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // DEFAULT STEALTH LAYER (always-on, every page)
   // ═══════════════════════════════════════════════════════════════════════════
 

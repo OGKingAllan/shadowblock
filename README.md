@@ -1,65 +1,109 @@
-# ShadowBlock
+<p align="center">
+  <img src="icons/icon128.png" alt="ShadowBlock" width="128" height="128">
+</p>
 
-A Chrome extension (Manifest V3) ad blocker with 123K+ network rules, anti-adblock bypass for 20+ domains, cosmetic filtering, YouTube ad blocking, and a clean dark UI. Built entirely on the declarativeNetRequest API.
+<h1 align="center">ShadowBlock</h1>
+
+<p align="center">
+  <strong>The ad blocker that will never sell you out.</strong>
+</p>
+
+<p align="center">
+  119,000+ filter rules. Zero data collected. No acceptable ads. No sellout.
+</p>
+
+---
+
+## What is ShadowBlock?
+
+ShadowBlock is a Chrome ad blocker built natively on Manifest V3 — not a port. It blocks ads, trackers, and annoyances across the web without collecting a single byte of your data.
+
+## Why ShadowBlock?
+
+Every major ad blocker has either sold out or been killed:
+
+- **Adblock Plus / AdBlock** make $63M/year letting Acceptable Ads through. A NYU study proved this exposes users to **13.6% more problematic ads** than using no blocker at all.
+- **uBlock Origin** was removed from the Chrome Web Store when Google killed MV2 support.
+- **uBlock Origin Lite** ships only ~17,000 rules with no custom filters, no element picker, and weak anti-adblock bypass.
+- **Total Adblock** paid a $2.5M class-action settlement over scammy auto-renewals.
+
+ShadowBlock exists because Chrome users deserve an ad blocker that actually works AND does not betray their trust.
 
 ## Features
 
-- **123K+ Network Rules** — Blocks ads, trackers, and annoyances using four declarativeNetRequest rulesets compiled from EasyList, EasyPrivacy, uBlock filters, and Peter Lowe's list
-- **Anti-Adblock Bypass** — Defeats adblock detection walls on 20+ major sites (Forbes, Wired, NYT, and more) using scriptlet injection and targeted countermeasures
-- **Cosmetic Filtering** — Hides ad containers, sticky banners, cookie consent popups, and other visual clutter via CSS-based element hiding
-- **YouTube Ad Blocking** — Dedicated content script that intercepts and skips YouTube pre-roll, mid-roll, and overlay ads
-- **Element Picker** — Right-click any element to create a custom cosmetic filter rule on the fly
-- **Resource Redirect Stubs** — 16 redirect resources (noop scripts, transparent pixels, VAST stubs) that silently replace blocked ad scripts so pages don't break
-- **Dark UI** — Clean popup and options page with per-site toggle, stats counter, and filter management
-- **Auto-Updating Filters** — Background service worker periodically fetches fresh filter lists
+- **119,000+ filter rules** — 7x more than uBlock Origin Lite
+- **Anti-adblock bypass** — works on Forbes, Wired, Fandom, and 20+ sites that block other ad blockers
+- **YouTube ad blocking** — skips pre-roll, mid-roll, overlay ads, and Premium upsell prompts
+- **37 scriptlets** — full scriptlet injection engine matching uBlock Origin / AdGuard capabilities
+- **16 surrogate scripts** — Google IMA, AdSense, Analytics, GTM, and more replaced with safe stubs
+- **Cosmetic filtering** — hides ad containers, sponsored content, and recommendation spam
+- **Element picker** — right-click any element to block it
+- **Custom rules** — write your own blocking rules
+- **Auto-updating filter lists** — 4,900 dynamic rules refreshed every 24 hours
+- **Zero data collection** — no telemetry, no analytics, no network requests to our servers
 
-## Installation
+## How We Compare
 
-1. Clone this repo:
-   ```
-   git clone https://github.com/OGKingAllan/shadowblock.git
-   ```
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable **Developer mode** (toggle in the top right)
-4. Click **Load unpacked** and select the cloned `shadowblock` folder
-5. The ShadowBlock icon will appear in your toolbar — click it to see stats and toggle blocking per site
+| Feature | ShadowBlock | uBO Lite | AdGuard | Adblock Plus |
+|---------|:-----------:|:--------:|:-------:|:------------:|
+| Filter rules | **119,000+** | ~17,000 | Large | Medium |
+| Custom rules | Yes | No | Yes* | Yes |
+| Element picker | Yes | No | Yes | Yes |
+| Anti-adblock bypass | **20+ sites** | Weak | Strong** | Moderate |
+| Scriptlet engine | **37 scriptlets** | Limited | Full | Small |
+| Surrogate scripts | **16 stubs** | No | Yes | Yes |
+| YouTube blocking | Yes | Weak | Strong | Basic |
+| Acceptable Ads | **Never** | No | No | **Yes (default)** |
+| Data collection | **None** | None | None | Tracking for AA |
+| Price | **Free** | Free | Free*** | Free/$4mo |
 
-## How It Works
+\* Requires Chrome Developer mode in MV3
+\** Requires separate AdGuard Extra extension
+\*** Desktop app is $2.49/mo
 
-ShadowBlock uses Chrome's Manifest V3 `declarativeNetRequest` API to block network requests before they reach the page. This is the modern, performant approach — rules are evaluated by Chrome's networking stack, not by JavaScript running in the page.
+## Our Promise
 
-On top of network blocking:
+**We will never:**
 
-- **Content scripts** run at `document_start` to inject cosmetic filters (hiding ad elements via CSS), scriptlets (neutralizing anti-adblock detection), and YouTube-specific ad interception
-- **Redirect stubs** (transparent pixels, noop scripts, empty VAST XML) replace blocked resources so sites that check for script existence don't throw errors or show broken layouts
-- **Anti-adblock rules** are domain-specific JSON configs that define which scriptlets to inject and which CSS selectors to hide for sites known to use adblock detection
+1. Take money from advertisers to whitelist their ads
+2. Collect, store, or sell your browsing data
+3. Ship a crippled free version to push you to premium
+4. Use dark patterns, countdown timers, or deceptive opt-outs
+5. Bundle toolbars, search engine changes, or antivirus upsells
+
+ShadowBlock makes money from optional premium features — never from advertisers paying to get unblocked.
+
+## Install
+
+**Chrome Web Store:** *(Coming soon — currently in review)*
+
+**Manual install (Developer mode):**
+1. Download or clone this repo
+2. Open chrome://extensions
+3. Enable Developer mode
+4. Click Load unpacked and select this folder
+
+## Privacy
+
+ShadowBlock makes zero network requests for telemetry. All filter lists are bundled with the extension. Your browsing data never leaves your device.
+
+[Full Privacy Policy](https://ogkingallan.github.io/shadowblock-privacy/)
 
 ## Tech Stack
 
-- **Platform:** Chrome Extension (Manifest V3)
-- **Ad Blocking:** `declarativeNetRequest` API with 4 static rulesets
-- **Filter Sources:** EasyList, EasyPrivacy, uBlock Origin filters, Peter Lowe's ad server list, uBlock annoyances
-- **Content Scripts:** Vanilla JavaScript (cosmetic filtering, scriptlet injection, YouTube blocker, element picker)
-- **UI:** HTML/CSS/JS (popup + options page, dark theme)
-- **Build Tools:** Python scripts for compiling filter lists into declarativeNetRequest JSON rules
-
-## Project Structure
-
-```
-shadowblock/
-├── manifest.json          # Extension manifest (MV3)
-├── background/            # Service worker (stats, filter updates, context menus)
-├── content/               # Content scripts (cosmetic, scriptlets, YouTube, element picker)
-├── data/                  # Anti-adblock rules, cosmetic filters, scriptlet definitions
-├── filters/               # Raw filter lists (EasyList, EasyPrivacy, etc.)
-├── icons/                 # Extension icons (16, 48, 128px)
-├── options/               # Options page (filter management, settings)
-├── popup/                 # Popup UI (stats, per-site toggle)
-├── rules/                 # Compiled declarativeNetRequest JSON rulesets
-├── scripts/               # Build scripts (filter compiler, icon generator)
-└── stubs/                 # Redirect resources (noop scripts, pixels, VAST stubs)
-```
+- **Architecture:** Chrome Manifest V3 (native, not ported from MV2)
+- **Ad blocking:** declarativeNetRequest API with 119,000+ static rules + 4,900 dynamic rules
+- **Content filtering:** Cosmetic CSS injection, MutationObserver, scriptlet engine
+- **Anti-adblock:** Domain-specific scriptlets injected at document_start
+- **Surrogates:** 16 redirect resources replacing blocked ad scripts with safe stubs
+- **YouTube:** Dedicated content script with JSON pruning, fetch/XHR interception, and DOM mutation observer
 
 ## License
 
-MIT
+All rights reserved. This code is provided for review and transparency purposes.
+
+---
+
+<p align="center">
+  Built by a solo dev who got tired of ad blockers selling out.
+</p>

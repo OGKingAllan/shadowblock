@@ -134,6 +134,58 @@
   injectCSS();
 
   // ---------------------------------------------------------------------------
+  // 1b. PROTECT CRITICAL UI — ensure core YouTube elements are never hidden
+  // ---------------------------------------------------------------------------
+  // Other cosmetic filters (generic or compiled) may accidentally match YouTube
+  // navigation elements. This protective CSS overrides any accidental hiding.
+  const PROTECT_CSS = `
+    ytd-masthead,
+    #masthead,
+    #masthead-container,
+    ytd-searchbox,
+    #search,
+    #search-form,
+    #search-input,
+    #search-icon-legacy,
+    #logo,
+    #logo-icon,
+    yt-icon#logo-icon,
+    ytd-topbar-logo-renderer,
+    #start,
+    #end,
+    #center,
+    #guide-button,
+    ytd-topbar-menu-button-renderer,
+    #buttons,
+    #voice-search-button,
+    #container.ytd-masthead,
+    #background.ytd-masthead,
+    tp-yt-app-header-layout > [slot="header"] {
+      display: initial !important;
+      visibility: visible !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      position: relative !important;
+      z-index: auto !important;
+      clip-path: none !important;
+    }
+  `;
+
+  function injectProtectCSS() {
+    const id = 'shadowblock-yt-protect';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = PROTECT_CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  injectProtectCSS();
+
+  // ---------------------------------------------------------------------------
   // 2. PAGE-CONTEXT SCRIPT INJECTION — for API interception
   // ---------------------------------------------------------------------------
   // This script runs in the page's JS context (not the content script sandbox)
@@ -604,6 +656,7 @@
     if (!document.getElementById('shadowblock-yt-css')) {
       injectCSS();
     }
+    injectProtectCSS();
 
     // Purge ads on the new page
     purgeExistingAds();
@@ -669,6 +722,7 @@
     if (!document.getElementById('shadowblock-yt-css')) {
       injectCSS();
     }
+    injectProtectCSS();
 
     // Re-purge any ad elements that slipped through
     purgeExistingAds();

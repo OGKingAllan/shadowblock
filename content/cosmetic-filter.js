@@ -467,15 +467,39 @@
     if (typeof chrome === 'undefined' || !chrome.storage) return;
     chrome.storage.local.get(['cosmeticIndex'], (data) => {
       if (!data.cosmeticIndex || !cosmeticEnabled) return;
+      const index = data.cosmeticIndex;
       const selectors = [];
-      // Match exact domain and parent domains
-      const parts = hostname.split('.');
-      for (let i = 0; i < parts.length - 1; i++) {
-        const domain = parts.slice(i).join('.');
-        if (data.cosmeticIndex[domain]) {
-          selectors.push(...data.cosmeticIndex[domain]);
+
+      if (Array.isArray(index)) {
+        // cosmeticIndex is a flat array of {selector, domains?, excludedDomains?}
+        const domainPart = hostname.replace(/^www\./, '');
+        for (const entry of index) {
+          if (!entry || !entry.selector) continue;
+          const doms = entry.domains;
+          const excl = entry.excludedDomains;
+          // If domains specified, only apply when current site matches
+          if (doms && doms.length > 0) {
+            const matches = doms.some(d => domainPart === d || domainPart.endsWith('.' + d));
+            if (!matches) continue;
+          }
+          // If excluded domains, skip when current site matches
+          if (excl && excl.length > 0) {
+            const excluded = excl.some(d => domainPart === d || domainPart.endsWith('.' + d));
+            if (excluded) continue;
+          }
+          selectors.push(entry.selector);
+        }
+      } else if (typeof index === 'object') {
+        // cosmeticIndex is domain-keyed: { "example.com": ["sel1", "sel2"] }
+        const parts = hostname.split('.');
+        for (let i = 0; i < parts.length - 1; i++) {
+          const domain = parts.slice(i).join('.');
+          if (index[domain]) {
+            selectors.push(...index[domain]);
+          }
         }
       }
+
       if (selectors.length === 0) return;
       // Inject as a separate style element
       const compiledStyleId = 'shadowblock-compiled-cosmetic';
